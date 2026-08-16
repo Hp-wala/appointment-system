@@ -1,4 +1,4 @@
-const HM_API_BASE = '/api';
+const HM_API_BASE = 'https://mla-appointment-system.onrender.com/api';
 
 // Prevent picking a past date
 const hmDateInput = document.getElementById('hmDate');

@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = 'https://mla-appointment-system.onrender.com/api';
 
 const bookingForm = document.getElementById('bookingForm');
 const formMsg = document.getElementById('formMsg');

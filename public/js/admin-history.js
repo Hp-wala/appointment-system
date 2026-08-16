@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = 'https://mla-appointment-system.onrender.com/api';
 
 const historyTableBody = document.getElementById('historyTableBody');
 const refreshHistoryBtn = document.getElementById('refreshHistoryBtn');

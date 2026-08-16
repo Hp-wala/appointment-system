@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = 'https://mla-appointment-system.onrender.com/api';
 
 const loginView = document.getElementById('loginView');
 const dashboardView = document.getElementById('dashboardView');
