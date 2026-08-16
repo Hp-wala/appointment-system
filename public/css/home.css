@@ -16,8 +16,9 @@
   --hm-shadow: 0 8px 30px rgba(15, 38, 73, 0.12);
 }
 
+html, body { overflow-x: hidden; max-width: 100%; }
 .hm { font-family: 'Inter', sans-serif; color: var(--hm-text); background: var(--hm-bg); }
-.hm h1, .hm h2, .hm h3, .hm h4, .hm .hm-heading { font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--hm-navy); margin: 0; }
+.hm h1, .hm h2, .hm h3, .hm h4, .hm .hm-heading { font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--hm-navy); margin: 0; word-break: break-word; }
 .hm * { box-sizing: border-box; }
 .hm a { text-decoration: none; color: inherit; }
 .hm ul { list-style: none; margin: 0; padding: 0; }
@@ -26,7 +27,7 @@
 .hm-wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
 
 @media (max-width: 720px) {
-  .hm-wrap { padding: 0 16px; }
+  .hm-wrap { padding: 0 16px; width: 100%; }
 
   .hm-utility .hm-wrap,
   .hm-navbar .hm-wrap {
@@ -37,13 +38,23 @@
   .hm-utility .hm-wrap {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 6px;
   }
 
-  .hm-utility-left,
+  .hm-utility-left {
+    flex-wrap: wrap;
+    row-gap: 4px;
+    font-size: 11px;
+  }
+
   .hm-utility-right {
     flex-wrap: wrap;
     row-gap: 8px;
+  }
+
+  .hm-utility-left span {
+    white-space: normal;
+    word-break: break-word;
   }
 
   .hm-navbar .hm-wrap {
@@ -54,15 +65,16 @@
   .hm-logo-text .hm-tagline { letter-spacing: 0.8px; }
 
   .hm-hero {
-    padding: 40px 0 54px;
+    padding: 32px 0 44px;
   }
 
   .hm-hero h1 {
-    font-size: clamp(2rem, 8vw, 3rem);
+    font-size: clamp(1.4rem, 6vw, 2rem);
+    line-height: 1.25;
   }
 
   .hm-hero p.hm-lede {
-    font-size: 14px;
+    font-size: 13.5px;
   }
 
   .hm-hero-actions {
@@ -97,6 +109,28 @@
   .hm-strip-form {
     width: 100%;
     max-width: 100%;
+  }
+
+  .hm-features {
+    grid-template-columns: 1fr;
+  }
+
+  .hm-section-head h2 {
+    font-size: 20px;
+  }
+
+  /* Gallery page - single column on phones */
+  .hm-gallery-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+  .hm-gallery-item {
+    height: 220px !important;
+  }
+
+  /* Appointment page grid */
+  .grid-2 {
+    grid-template-columns: 1fr !important;
   }
 }
 
