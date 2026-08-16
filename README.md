@@ -1,4 +1,5 @@
 # MLA Appointment Management Website
+<!-- Netlify redeploy trigger -->
 
 A full-stack web app for booking and managing appointments with an MLA's office.
 

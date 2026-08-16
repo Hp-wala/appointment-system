@@ -25,6 +25,81 @@
 
 .hm-wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
 
+@media (max-width: 720px) {
+  .hm-wrap { padding: 0 16px; }
+
+  .hm-utility .hm-wrap,
+  .hm-navbar .hm-wrap {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .hm-utility .hm-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .hm-utility-left,
+  .hm-utility-right {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .hm-navbar .hm-wrap {
+    gap: 14px;
+  }
+
+  .hm-logo-text .hm-title { font-size: 18px; }
+  .hm-logo-text .hm-tagline { letter-spacing: 0.8px; }
+
+  .hm-hero {
+    padding: 40px 0 54px;
+  }
+
+  .hm-hero h1 {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+
+  .hm-hero p.hm-lede {
+    font-size: 14px;
+  }
+
+  .hm-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hm-btn-solid,
+  .hm-btn-outline {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hm-booking-card {
+    width: 100%;
+    min-width: 0;
+    margin-left: 0;
+  }
+
+  .hm-contact-grid,
+  .hm-info-grid,
+  .hm-news-gallery-grid,
+  .hm-footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hm-strip .hm-wrap {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .hm-strip-form {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
 /* ---------- Utility bar ---------- */
 .hm-utility {
   background: var(--hm-navy);
@@ -490,6 +565,7 @@
 .hm-section-head h2 { font-size: 28px; }
 
 .hm-info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+.hm-contact-grid { max-width: 900px; margin: 0 auto; }
 .hm-info-col h3 { font-size: 14px; letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 16px; }
 
 .hm-about-photo { width: 88px; height: 88px; border-radius: 10px; object-fit: cover; margin-bottom: 14px; }
