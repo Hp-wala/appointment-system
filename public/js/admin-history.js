@@ -32,7 +32,12 @@ function formatTime(t) {
 
 async function fetchAppointments() {
   try {
-    const res = await fetch(`${API_BASE}/appointments`, { credentials: 'same-origin' });
+    const token = sessionStorage.getItem('mla_admin_token');
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    const res = await fetch(`${API_BASE}/appointments`, { headers, credentials: 'same-origin' });
     if (!res.ok) throw new Error('Unauthorized or failed request');
     return await res.json();
   } catch (err) {

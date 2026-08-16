@@ -27,12 +27,17 @@ function clearLoggedIn() {
 }
 
 async function authFetch(url, options = {}) {
+  const token = sessionStorage.getItem('mla_admin_token');
   const headers = Object.assign({}, options.headers, {
     'Content-Type': 'application/json'
   });
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   const res = await fetch(url, Object.assign({}, options, { headers, credentials: 'same-origin' }));
   if (res.status === 401) {
     clearLoggedIn();
+    sessionStorage.removeItem('mla_admin_token');
     showLogin('Session expired. Please log in again.');
     throw new Error('Unauthorized');
   }
@@ -70,6 +75,9 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     });
     const data = await res.json();
     if (data.success) {
+      if (data.token) {
+        sessionStorage.setItem('mla_admin_token', data.token);
+      }
       setLoggedIn();
       showDashboard();
     } else {
@@ -179,16 +187,22 @@ document.getElementById('resetPasswordModal').addEventListener('click', (e) => {
 
 document.getElementById('logoutLink').addEventListener('click', async (e) => {
   e.preventDefault();
+  const token = sessionStorage.getItem('mla_admin_token');
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   try {
     await fetch(`${API_BASE}/admin/logout`, {
       method: 'POST',
       credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' }
+      headers: headers
     });
   } catch (err) {
     // ignore logout errors
   }
   clearLoggedIn();
+  sessionStorage.removeItem('mla_admin_token');
   showLogin();
 });
 
@@ -744,8 +758,14 @@ async function initializeAdmin() {
   }
 
   try {
+    const token = sessionStorage.getItem('mla_admin_token');
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
     const res = await fetch(`${API_BASE}/admin/validate`, {
       method: 'GET',
+      headers: headers,
       credentials: 'same-origin'
     });
     if (res.ok) {
@@ -753,10 +773,12 @@ async function initializeAdmin() {
       showDashboard();
     } else {
       clearLoggedIn();
+      sessionStorage.removeItem('mla_admin_token');
       showLogin();
     }
   } catch (err) {
     clearLoggedIn();
+    sessionStorage.removeItem('mla_admin_token');
     showLogin('Unable to verify session. Please log in.');
   }
 }

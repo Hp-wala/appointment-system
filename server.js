@@ -107,13 +107,28 @@ function clearAdminCookie(res) {
   res.setHeader('Set-Cookie', cookie);
 }
 
+function getAdminToken(req) {
+  let token = getCookie(req, ADMIN_COOKIE_NAME);
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    }
+  }
+  if (!token) {
+    token = req.headers['x-admin-token'];
+  }
+  return token;
+}
+
 function requireAdmin(req, res, next) {
-  const token = getCookie(req, ADMIN_COOKIE_NAME);
+  const token = getAdminToken(req);
   if (!token || !sessions.has(token)) {
     return res.status(401).json({ error: 'Unauthorized. Please log in.' });
   }
   next();
 }
+
 
 function stripHtml(value) {
   if (typeof value !== 'string') return value;
@@ -254,14 +269,14 @@ app.post('/api/admin/login', loginLimiter, (req, res) => {
     sessions.set(token, { createdAt: Date.now() });
     setAdminCookie(res, token);
     logSecurityEvent({ eventType: 'admin_login_success', req, details: { path: '/api/admin/login' } }).catch(() => {});
-    return res.json({ success: true });
+    return res.json({ success: true, token });
   }
   logSecurityEvent({ eventType: 'failed_admin_login', req, details: { path: '/api/admin/login' } }).catch(() => {});
   return res.status(401).json({ success: false, error: 'Incorrect password.' });
 });
 
 app.post('/api/admin/logout', requireAdmin, (req, res) => {
-  const token = getCookie(req, ADMIN_COOKIE_NAME);
+  const token = getAdminToken(req);
   if (token) {
     sessions.delete(token);
   }
@@ -270,7 +285,7 @@ app.post('/api/admin/logout', requireAdmin, (req, res) => {
 });
 
 app.get('/api/admin/validate', (req, res) => {
-  const token = getCookie(req, ADMIN_COOKIE_NAME);
+  const token = getAdminToken(req);
   if (token && sessions.has(token)) {
     return res.json({ success: true });
   }
