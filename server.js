@@ -31,10 +31,14 @@ function getAdminPassword() {
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim()).filter(Boolean)
-  : ['http://localhost:3000'];
+  : [
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      'https://mla-appointment-system.onrender.com'
+    ];
 
 if (!process.env.ALLOWED_ORIGINS) {
-  console.warn('WARNING: ALLOWED_ORIGINS is not configured. Defaulting to localhost only. Set ALLOWED_ORIGINS in production.');
+  console.warn('WARNING: ALLOWED_ORIGINS is not configured. Defaulting to localhost and the Render deployment URL.');
 }
 
 const helmetOptions = {
@@ -244,13 +248,25 @@ function handleValidationErrors(req, res, next) {
 }
 
 app.use(helmet(helmetOptions));
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
+app.use(cors((req, callback) => {
+  const origin = req.header('Origin');
+  let corsOptions = { origin: false };
+  if (!origin) {
+    corsOptions.origin = true;
+  } else {
+    const isAllowed = allowedOrigins.includes(origin);
+    let isSameOrigin = false;
+    try {
+      const originHost = new URL(origin).host;
+      if (originHost === req.headers.host) {
+        isSameOrigin = true;
+      }
+    } catch (e) {}
+    if (isAllowed || isSameOrigin) {
+      corsOptions.origin = true;
     }
-    return callback(new Error('Origin not allowed by CORS'));
   }
+  callback(null, corsOptions);
 }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));

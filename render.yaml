@@ -11,6 +11,8 @@ services:
         value: 3000
       - key: ADMIN_PASSWORD
         value: changeme123
+      - key: ADMIN_RESET_CODE
+        value: mla12345
       - key: SUPABASE_URL
         value: ''
       - key: SUPABASE_ANON_KEY
@@ -18,7 +20,7 @@ services:
       - key: SUPABASE_SERVICE_KEY
         value: ''
       - key: ALLOWED_ORIGINS
-        value: ''
+        value: 'https://mla-appointment-system.onrender.com,http://localhost:3000'
       - key: SMTP_HOST
         value: ''
       - key: SMTP_PORT
