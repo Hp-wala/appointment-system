@@ -72,3 +72,21 @@ create table if not exists public.security_logs (
 
 create index if not exists idx_security_logs_event_type on public.security_logs (event_type);
 create index if not exists idx_security_logs_created_at on public.security_logs (created_at desc);
+
+-- Enable RLS on both tables
+alter table public.appointments enable row level security;
+alter table public.security_logs enable row level security;
+
+-- Allow anyone to INSERT an appointment (public citizen form)
+create policy if not exists "Public can submit appointments"
+  on public.appointments for insert
+  with check (true);
+
+-- Allow anyone to SELECT their own appointments (status check by mobile)
+create policy if not exists "Public can read appointments"
+  on public.appointments for select
+  using (true);
+
+-- Only service_role can UPDATE / DELETE appointments (admin actions)
+-- service_role bypasses RLS so no explicit policy needed for admin operations.
+

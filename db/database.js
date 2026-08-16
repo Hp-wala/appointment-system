@@ -8,6 +8,7 @@
 // trigger, and the RLS policies).
 
 const supabase = require('./supabaseClient');
+const crypto = require('crypto');
 
 // Convert DB row (snake_case) -> app shape (camelCase), matching what the
 // frontend already expects.
@@ -31,6 +32,15 @@ function toAppShape(row) {
   };
 }
 
+// Generate a unique token number in app code.
+// The DB trigger (generate_appointment_token) will override this with a
+// sequential MLA-000001 format IF the trigger is set up correctly.
+// This fallback ensures inserts never fail due to NOT NULL on token_number.
+function generateFallbackToken() {
+  const rand = crypto.randomInt(100000, 999999);
+  return 'MLA-' + rand;
+}
+
 async function createAppointment({ name, mobile, email = null, purpose, preferredDate = null, preferredTime = null }) {
   const { data, error } = await supabase
     .from('appointments')
@@ -41,14 +51,19 @@ async function createAppointment({ name, mobile, email = null, purpose, preferre
       purpose,
       preferred_date: preferredDate,
       preferred_time: preferredTime,
-      status: 'pending'
+      status: 'pending',
+      token_number: generateFallbackToken() // DB trigger will override with sequential ID if set up
     })
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('[DB] createAppointment error:', JSON.stringify(error));
+    throw error;
+  }
   return toAppShape(data);
 }
+
 
 async function getAllAppointments() {
   const { data, error } = await supabase
