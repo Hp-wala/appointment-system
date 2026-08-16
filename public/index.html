@@ -2,7 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=1280, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+<script>
+  (function () {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+      const viewport = document.querySelector('meta[name="viewport"]');
+      if (viewport) {
+        viewport.setAttribute('content', 'width=1280, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no');
+      }
+    }
+  })();
+</script>
 <title>MLA Office — Committed to Serve, Dedicated to Progress</title>
 <link rel="stylesheet" href="css/home.css">
 </head>
