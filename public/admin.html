@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Office of the MLA</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="seal">MLA</div>
+    <div class="masthead-title">
+      <span class="eyebrow">Office of the MLA · Internal Use</span>
+      <h1>Appointment Dashboard</h1>
+    </div>
+    <nav id="logoutNav" style="display:none;">
+      <a href="#" class="btn btn-outline btn-sm" id="handoverBtn">Handover & Disclaimer</a>
+      <button class="btn btn-outline btn-sm" id="changePasswordBtn">Change password</button>
+      <button class="btn btn-outline btn-sm" id="historyBtn">History</button>
+      <a href="#" id="logoutLink">Log out</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Login gate -->
+<div class="container" id="loginView">
+  <div class="login-wrap">
+    <div class="panel login-card">
+      <div class="panel-header"><h3>Staff Login</h3></div>
+      <div class="panel-body">
+        <div class="field password-field">
+          <label for="adminPassword">Admin password</label>
+          <input type="password" id="adminPassword" placeholder="••••••••">
+          <button type="button" class="toggle-password" id="toggleAdminPassword" aria-label="Show password">👁</button>
+        </div>
+        <button class="btn btn-primary" id="loginBtn">Log in</button>
+        <button class="btn btn-outline btn-sm" id="forgotPasswordBtn" style="margin-top:12px;">Forgot password?</button>
+        <div id="loginMsg" class="form-msg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="resetPasswordModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Reset forgotten password</h3>
+        <p style="margin:4px 0 0;color:var(--ink-soft);font-size:13px;">Enter the reset code and choose a new password.</p>
+      </div>
+      <button class="modal-close" id="closeResetPasswordModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="field password-field">
+        <label for="resetCode">Reset code</label>
+        <input type="password" id="resetCode" placeholder="Enter reset code">
+        <button type="button" class="toggle-password" id="toggleResetCode" aria-label="Show code">👁</button>
+      </div>
+      <div style="margin-top:-10px;margin-bottom:16px;color:var(--ink-soft);font-size:12px;">Set `ADMIN_RESET_CODE` in your `.env` and restart the app to use this form.</div>
+      <div class="field password-field">
+        <label for="resetNewPassword">New password</label>
+        <input type="password" id="resetNewPassword" placeholder="At least 8 characters">
+        <button type="button" class="toggle-password" id="toggleResetNewPassword" aria-label="Show password">👁</button>
+      </div>
+      <div class="field password-field">
+        <label for="resetConfirmPassword">Confirm password</label>
+        <input type="password" id="resetConfirmPassword" placeholder="Repeat new password">
+        <button type="button" class="toggle-password" id="toggleResetConfirmPassword" aria-label="Show password">👁</button>
+      </div>
+      <div id="resetPasswordMsg" class="form-msg"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline btn-sm" id="closeResetPasswordModal">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="resetPasswordSubmitBtn">Reset password</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<main class="page container" id="dashboardView" style="display:none;">
+
+  <div class="intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;">
+    <div>
+      <h2>Appointment Requests</h2>
+      <p>Review incoming requests and approve, reject, or reschedule them.</p>
+    </div>
+    <button class="btn btn-outline" id="refreshBtn">↻ Refresh</button>
+  </div>
+
+  <div class="panel">
+    <div class="tabs" id="sectionTabs">
+      <button class="tab-btn active" data-section="appointments">Appointments</button>
+      <button class="tab-btn" data-section="security">🔒 Security Logs</button>
+    </div>
+
+    <div id="appointmentsSection">
+      <div class="tabs" id="viewTabs">
+        <button class="tab-btn active" data-view="list">List</button>
+        <button class="tab-btn" data-view="calendar">Calendar</button>
+      </div>
+
+      <div class="tabs" id="filterTabs" style="border-top:1px solid var(--line);">
+      <button class="tab-btn active" data-filter="all">All <span class="tab-count" id="count-all">0</span></button>
+      <button class="tab-btn" data-filter="pending">Pending <span class="tab-count" id="count-pending">0</span></button>
+      <button class="tab-btn" data-filter="approved">Approved <span class="tab-count" id="count-approved">0</span></button>
+      <button class="tab-btn" data-filter="rescheduled">Rescheduled <span class="tab-count" id="count-rescheduled">0</span></button>
+      <button class="tab-btn" data-filter="rejected">Rejected <span class="tab-count" id="count-rejected">0</span></button>
+    </div>
+
+    <!-- List view -->
+    <div class="panel-body" id="listView">
+      <div id="requestList"></div>
+    </div>
+
+    <!-- Calendar view -->
+    <div id="calendarView" style="display:none;">
+      <div class="cal-header">
+        <h3 id="calMonthLabel">Month Year</h3>
+        <div class="cal-nav">
+          <button id="calPrev">‹</button>
+          <button id="calNext">›</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    </div>
+
+    <div id="securityLogsSection" style="display:none; padding: 20px;">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:18px;">
+        <div>
+          <label for="securityFilter" style="font-size:12px;color:var(--ink-soft);display:block;margin-bottom:4px;">Filter by event type</label>
+          <select id="securityFilter" style="padding:10px 12px;border:1px solid var(--line);border-radius:8px;min-width:240px;">
+            <option value="">All events</option>
+            <option value="admin_login_success">Admin login success</option>
+            <option value="failed_admin_login">Failed admin login</option>
+            <option value="rate_limit_exceeded">Rate limit exceeded</option>
+            <option value="invalid_input_attempt">Invalid input attempt</option>
+          </select>
+        </div>
+        <div style="margin-left:auto;">
+          <button class="btn btn-outline" id="refreshLogsBtn">Refresh logs</button>
+        </div>
+      </div>
+      <div id="securityLogMsg" class="form-msg"></div>
+      <div style="overflow-x:auto;">
+        <table class="data-table" id="securityLogsTable" style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);">Timestamp</th>
+              <th style="text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);">Event</th>
+              <th style="text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);">IP / Location</th>
+              <th style="text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);">Path</th>
+              <th style="text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);">Details</th>
+            </tr>
+          </thead>
+          <tbody id="securityLogsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Reschedule/Approve modal -->
+<div class="modal-backdrop" id="rescheduleModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Confirm Appointment</h3>
+      <button class="modal-close" id="closeModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--ink-soft);margin-top:0;" id="modalCitizenName"></p>
+      <p id="modalActionDesc" style="font-size:13px;color:var(--ink-soft);margin-top:0;">Choose a date and time when the MLA is available, then confirm the request.</p>
+      <div class="field">
+        <label for="modalDate">Confirmed date</label>
+        <input type="date" id="modalDate">
+      </div>
+      <div class="field">
+        <label for="modalTime">Confirmed time</label>
+        <input type="time" id="modalTime">
+      </div>
+      <div class="field">
+        <label for="modalNote">Note to citizen <span class="sub">(optional)</span></label>
+        <textarea id="modalNote" placeholder="e.g. MLA is available on this date and time."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline btn-sm" id="modalCancel">Cancel</button>
+      <button class="btn btn-reschedule btn-sm" id="modalConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="passwordModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Change Admin Password</h3>
+        <p style="margin:4px 0 0;color:var(--ink-soft);font-size:13px;">Update the admin password for future logins.</p>
+      </div>
+      <button class="modal-close" id="closePasswordModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label for="passwordCurrent">Current password</label>
+        <input type="password" id="passwordCurrent" placeholder="••••••••">
+      </div>
+      <div class="field">
+        <label for="passwordNew">New password</label>
+        <input type="password" id="passwordNew" placeholder="At least 8 characters">
+      </div>
+      <div class="field">
+        <label for="passwordConfirm">Confirm new password</label>
+        <input type="password" id="passwordConfirm" placeholder="Re-enter new password">
+      </div>
+      <div id="passwordMsg" class="form-msg"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline btn-sm" id="closePasswordModal">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="savePasswordBtn">Save password</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="handoverModal">
+  <div class="modal modal-large">
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow" style="margin-bottom:8px;display:inline-block;letter-spacing:1px;color:var(--gold);text-transform:uppercase;">Handover document</span>
+        <h3>System Handover & Disclaimer</h3>
+      </div>
+      <button class="modal-close" id="closeHandoverModal">&times;</button>
+    </div>
+    <div class="modal-body handover-body">
+      <div class="handover-field">
+        <div>
+          <label for="handoverDeveloper">Developer</label>
+          <input type="text" id="handoverDeveloper" placeholder="[Your Name]">
+        </div>
+        <div>
+          <label for="handoverOffice">Handed Over To</label>
+          <input type="text" id="handoverOffice" placeholder="[Office Name / Administrator Name]">
+        </div>
+        <div>
+          <label for="handoverDate">Date of Handover</label>
+          <input type="date" id="handoverDate" placeholder="[Date]">
+        </div>
+      </div>
+
+      <p class="section-intro">Project: <strong>MLA Appointment Management System</strong></p>
+      <div class="doc-section">
+        <h4>1. Purpose of This Document</h4>
+        <p>This document formally records the handover of the MLA Appointment Management System ("the System") from the developer to the designated administrator(s) of the MLA's office. It defines the scope of the developer's responsibility and clarifies that all operational responsibility transfers to the administrator(s) upon handover.</p>
+      </div>
+      <div class="doc-section">
+        <h4>2. Scope of Developer's Responsibility</h4>
+        <p>The developer's role was limited to the following:</p>
+        <ul>
+          <li>Design, development, and testing of the System</li>
+          <li>Initial deployment and configuration</li>
+          <li>Providing necessary documentation for system usage and maintenance</li>
+        </ul>
+        <p>The developer's responsibility ends at the point of successful handover and deployment confirmation.</p>
+      </div>
+      <div class="doc-section">
+        <h4>3. Transfer of Operational Control</h4>
+        <p>Upon handover, the following are transferred fully to the administrator(s):</p>
+        <ul>
+          <li>Admin panel credentials and access control</li>
+          <li>Ownership and management of citizen appointment data</li>
+          <li>Day-to-day operation, monitoring, and maintenance of the System</li>
+          <li>Responsibility for safeguarding login credentials and system access</li>
+        </ul>
+      </div>
+      <div class="doc-section">
+        <h4>4. Disclaimer of Liability</h4>
+        <p>From the date of handover onward:</p>
+        <ul>
+          <li>The developer holds no ongoing responsibility or liability for the System's operation, data handling, or security.</li>
+          <li>Any incidents including, but not limited to, unauthorized access, hacking, data breaches, data loss, misuse of citizen information, system downtime, or misconfiguration occurring after handover are the sole responsibility of the administrator(s) managing the System.</li>
+          <li>The developer shall not be held liable in any legal, financial, administrative, or reputational capacity for any consequences arising from the System's use, misuse, or compromise after the handover date.</li>
+          <li>This includes incidents caused by weak password practices, failure to update credentials, mishandling of admin access, or any other administrative negligence occurring post-handover.</li>
+        </ul>
+      </div>
+      <div class="doc-section">
+        <h4>5. Administrator's Acknowledged Responsibilities</h4>
+        <p>By accepting handover of this System, the administrator(s) acknowledge responsibility for:</p>
+        <ul>
+          <li>Maintaining confidentiality of admin login credentials</li>
+          <li>Ensuring only authorized personnel access the admin panel</li>
+          <li>Reporting and addressing any security concerns independently or through appropriately contracted support</li>
+          <li>Complying with applicable data protection norms in managing citizen information</li>
+        </ul>
+      </div>
+      <div class="doc-section">
+        <h4>6. No Warranty</h4>
+        <p>The System is provided "as-is" at the time of handover. No warranty, express or implied, is made regarding uninterrupted operation, absolute security, or fitness for any particular purpose beyond what was demonstrated and agreed upon during development.</p>
+      </div>
+      <div class="doc-section">
+        <h4>7. Acknowledgment</h4>
+        <p>By signing below, the administrator confirms understanding and acceptance of the terms outlined in this document.</p>
+        <div class="signature-grid">
+          <div class="signature-block">
+            <p><strong>Acknowledged by:</strong></p>
+            <p>Name:</p>
+            <input class="signature-input" type="text" placeholder="_______________________________">
+            <p>Designation:</p>
+            <input class="signature-input" type="text" placeholder="_______________________________">
+            <p>Office:</p>
+            <input class="signature-input" type="text" placeholder="_______________________________">
+            <p>Signature:</p>
+            <input class="signature-input" type="text" placeholder="_______________________________">
+            <p>Date:</p>
+            <input class="signature-input" type="text" placeholder="_______________________________">
+          </div>
+          <div class="signature-block">
+            <p><strong>Handed over by (Developer):</strong></p>
+            <p>Name:</p>
+            <input class="signature-input" type="text" placeholder="_______________________________">
+            <p>Signature:</p>
+            <input class="signature-input" type="text" placeholder="_______________________________">
+            <p>Date:</p>
+            <input class="signature-input" type="text" placeholder="_______________________________">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary btn-sm" id="saveHandoverBtn">Save</button>
+      <button class="btn btn-outline btn-sm" id="printHandoverBtn">Print / Save as PDF</button>
+      <button class="btn btn-primary btn-sm" id="closeHandoverBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<footer>Office of the MLA · Internal appointment management tool.</footer>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

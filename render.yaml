@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: mla-appointment-system
+    env: node
+    plan: starter
+    branch: main
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: ADMIN_PASSWORD
+        value: changeme123
+      - key: SUPABASE_URL
+        value: ''
+      - key: SUPABASE_ANON_KEY
+        value: ''
+      - key: SUPABASE_SERVICE_KEY
+        value: ''
+      - key: ALLOWED_ORIGINS
+        value: ''
+      - key: SMTP_HOST
+        value: ''
+      - key: SMTP_PORT
+        value: ''
+      - key: SMTP_USER
+        value: ''
+      - key: SMTP_PASS
+        value: ''
+      - key: MLA_EMAIL
+        value: ''

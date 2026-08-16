@@ -1,0 +1,21 @@
+{
+  "name": "mla-appointment-system",
+  "version": "1.0.0",
+  "description": "MLA Appointment Management Website - citizen booking + admin dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.112.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "express-rate-limit": "^6.8.0",
+    "express-validator": "^7.0.1",
+    "geoip-lite": "^1.4.10",
+    "helmet": "^7.0.0",
+    "nodemailer": "^9.0.4"
+  }
+}

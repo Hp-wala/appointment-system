@@ -1,0 +1,53 @@
+Attached Element Context from Integrated Browser
+
+Element: div.hm-logo-badge
+
+URL: file:///c%3A/Users/ritul/OneDrive/Desktop/mla-appointment-system/public/index.html
+
+HTML Path: header.hm-navbar > div.hm-wrap > a.hm-logo > div.hm-logo-badge
+
+Outer HTML:
+```html
+<div class="hm-logo-badge">MLA</div>
+```
+
+Dimensions:
+- top: 64px
+- left: 32px
+- width: 46px
+- height: 46px
+
+CSS:
+```css
+.hm * { box-sizing: border-box; }
+.hm-logo-badge { width: 46px; height: 46px; border-radius: 50%;
+  background: linear-gradient(160deg, var(--hm-gold-2), var(--hm-gold-dark));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Poppins', sans-serif; font-weight: 800; color: #fff; font-size: 15px;
+  flex-shrink: 0; }
+
+/* Inherited */
+.hm a { color: inherit }
+.hm { font-family: 'Inter', sans-serif; color: var(--hm-text) }
+
+/* Resolved values */
+border-radius: 50%;
+align-items: center;
+box-sizing: border-box;
+color: rgb(255, 255, 255);
+cursor: pointer /*UA*/;
+display: flex;
+flex-shrink: 0;
+font-family: Poppins, sans-serif;
+font-size: 15px;
+font-weight: 800;
+height: 46px;
+justify-content: center;
+unicode-bidi: isolate /*UA*/;
+width: 46px;
+
+/* CSS variables */
+--hm-gold-2: #E8B54B;
+--hm-gold-dark: #B9821F;
+--hm-text: #1B2430;
+```

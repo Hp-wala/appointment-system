@@ -1,0 +1,8 @@
+node_modules/
+.env
+db/appointments.json
+.DS_Store
+security/logs/
+tmp_validation.js
+tmp_validation2.js
+*.log

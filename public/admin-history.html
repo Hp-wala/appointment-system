@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appointment History — Office of the MLA</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.history-page {
+  color: #fff;
+  background: #16233f;
+}
+.history-page .masthead, .history-page .masthead-inner, .history-page .masthead-title h1, .history-page .masthead-title .eyebrow {
+  color: #fff;
+}
+.history-page .intro p, .history-page .tab-btn, .history-page th, .history-page td {
+  color: #fff;
+}
+.history-page .btn-outline {
+  color: #fff;
+  border-color: rgba(255,255,255,0.35);
+}
+.history-page .btn-outline:hover {
+  border-color: rgba(255,255,255,0.7);
+}
+.history-page .panel {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.18);
+}
+.history-page table {
+  color: #fff;
+}
+.history-page th, .history-page td {
+  border-color: rgba(255,255,255,0.15);
+}
+.history-page .data-table thead th {
+  border-bottom: 1px solid rgba(255,255,255,0.35);
+}
+.history-page .btn-outline {
+  border-color: rgba(255,255,255,0.35);
+}
+.history-page footer {
+  color: rgba(255,255,255,0.72);
+}
+</style>
+</head>
+<body class="history-page">
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="seal">MLA</div>
+    <div class="masthead-title">
+      <span class="eyebrow">Office of the MLA · Internal Use</span>
+      <h1>Appointment History</h1>
+    </div>
+    <nav id="adminHistoryNav">
+      <button class="btn btn-outline btn-sm" id="handoverBtn">Handover & Disclaimer</button>
+      <button class="btn btn-outline btn-sm" id="logoutLink">Log out</button>
+    </nav>
+  </div>
+</header>
+
+<main class="page container" id="historyView">
+  <div class="intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;">
+    <div>
+      <h2>Appointment Request History</h2>
+      <p>View the complete request history with status counts and timestamps in a separate window.</p>
+    </div>
+    <button class="btn btn-outline" id="refreshHistoryBtn">Refresh</button>
+  </div>
+
+  <div class="panel" style="padding:20px;">
+    <div class="tabs" style="gap:10px;flex-wrap:wrap;">
+      <div class="tab-btn" style="cursor:default;">All <span id="history-count-all">0</span></div>
+      <div class="tab-btn" style="cursor:default;">Pending <span id="history-count-pending">0</span></div>
+      <div class="tab-btn" style="cursor:default;">Approved <span id="history-count-approved">0</span></div>
+      <div class="tab-btn" style="cursor:default;">Rescheduled <span id="history-count-rescheduled">0</span></div>
+      <div class="tab-btn" style="cursor:default;">Rejected <span id="history-count-rejected">0</span></div>
+    </div>
+
+    <div style="overflow-x:auto;margin-top:20px;">
+      <table class="data-table" id="historyTable" style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);">Name</th>
+            <th style="text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);">Mobile</th>
+            <th style="text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);">Status</th>
+            <th style="text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);">Requested</th>
+            <th style="text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);">Confirmed</th>
+            <th style="text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);">Submitted</th>
+            <th style="text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);">Last Updated</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer style="padding:22px 20px;text-align:center;color:var(--ink-soft);font-size:13px;">
+  Office of the MLA · Internal appointment management tool.
+</footer>
+
+<script src="js/admin-history.js"></script>
+</body>
+</html>

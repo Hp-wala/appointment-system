@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book an Appointment — Office of the MLA</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+
+<!-- Utility bar -->
+<div class="hm-utility">
+  <div class="hm-wrap">
+    <div class="hm-utility-left">
+      <span>📞 +91 96783 67047 | +91 70990 12666 | +91 94350 19219</span>
+      <span>✉️ digantakalitamla@gamil.com</span>
+    </div>
+    <div class="hm-utility-right">
+      <div id="google_translate_element" class="translate-widget"></div>
+      <span style="margin-right:4px;">Follow Us:</span>
+      <a class="hm-social" href="https://www.facebook.com/share/1C181pYjWk/" aria-label="Facebook" target="_blank" rel="noopener">f</a>
+      <a class="hm-social" href="https://x.com/diganta68?lang=en" aria-label="X" target="_blank" rel="noopener">𝕏</a>
+      <a class="hm-social" href="https://www.instagram.com/digantakalita_?igsh=dXdqbzhuenNxanF4" aria-label="Instagram" target="_blank" rel="noopener">◎</a>
+    </div>
+  </div>
+</div>
+
+<!-- Navbar -->
+<header class="hm-navbar">
+  <div class="hm-wrap">
+    <a class="hm-logo" href="index.html">
+      <div class="hm-logo-badge">MLA</div>
+      <div class="hm-logo-text">
+        <div class="hm-title">MLA</div>
+        <div class="hm-tagline">Public Service | Progress | People</div>
+      </div>
+    </a>
+    <nav class="hm-nav-links">
+      <a href="index.html">Home</a>
+      <a href="appointments.html" class="active">Appointments</a>
+      <a href="gallery.html">Photo Gallery</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <a href="admin.html" class="hm-cta-btn">Staff Login</a>
+    <button class="hm-nav-toggle" id="navToggle">☰</button>
+  </div>
+</header>
+
+<main class="page container">
+  <div class="intro">
+    <h2>Request a meeting</h2>
+    <p>Fill in your details below to request time with the MLA. You'll receive a token number for this request — keep it safe to check your status any time.</p>
+  </div>
+
+  <div class="grid-2">
+    <!-- Booking form -->
+    <section class="appointment-card">
+      <div class="hm-booking-head">
+        <span class="icn">📅</span>
+        <div>
+          <strong>Book an Appointment</strong>
+          <span>Meet your MLA — Your Voice Matters</span>
+        </div>
+      </div>
+      <div class="hm-booking-body">
+        <form id="bookingForm">
+          <div class="hm-field">
+            <label for="name">Full name</label>
+            <input type="text" id="name" name="name" placeholder="e.g. Ritul Das" required>
+          </div>
+
+          <div class="hm-field">
+            <label for="mobile">Mobile number <span class="sub">(10 digits, used to check status later)</span></label>
+            <input type="tel" id="mobile" name="mobile" placeholder="98xxxxxxxx" maxlength="10" pattern="[0-9]{10}" required>
+          </div>
+
+          <div class="hm-field">
+            <label for="email">Email address <span class="sub">(optional)</span></label>
+            <input type="email" id="email" name="email" placeholder="your@example.com">
+          </div>
+
+          <div class="hm-field">
+            <label for="purpose">Purpose of meeting</label>
+            <textarea id="purpose" name="purpose" placeholder="Briefly describe why you'd like to meet the MLA" required></textarea>
+          </div>
+
+          <button type="submit" class="hm-submit-btn" id="submitBtn">Submit Request</button>
+
+          <div id="formMsg" class="hm-form-msg"></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Status check -->
+    <section class="appointment-card">
+      <div class="hm-booking-head">
+        <span class="icn">🔎</span>
+        <div>
+          <strong>Check Request Status</strong>
+          <span>Enter the mobile number you used when submitting your request.</span>
+        </div>
+      </div>
+      <div class="hm-booking-body">
+        <div class="hm-field">
+          <label for="statusEmail">Email address</label>
+          <input type="email" id="statusEmail" placeholder="your@example.com">
+        </div>
+        <div class="hm-field">
+          <label for="statusMobile">Mobile number</label>
+          <input type="tel" id="statusMobile" placeholder="98xxxxxxxx" maxlength="10">
+        </div>
+        <button class="hm-submit-btn" id="checkStatusBtn">Check Status</button>
+
+        <div id="statusResults" class="hm-form-msg" style="margin-top:20px;"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>Office of the MLA · Appointment Request Portal — for genuine constituent queries only.</footer>
+
+<script src="js/translate-init.js"></script>
+<script type="text/javascript" src="https://translate.googleapis.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="js/home.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
