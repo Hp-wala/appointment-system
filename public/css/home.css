@@ -303,62 +303,48 @@ html, body { overflow-x: hidden; max-width: 100%; }
 }
 .hm-hero-actions {
   display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  align-items: stretch;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
 }
 
 .hm-btn-solid,
 .hm-btn-outline {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 14px;
-  padding: 14px 28px;
-  border-radius: 8px;
+  width: 230px !important;
+  height: 50px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  border-radius: 6px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  margin: 0 !important;
   text-decoration: none;
-  border: 2px solid transparent;
-  transition: all 0.2s ease;
   cursor: pointer;
-  min-width: 200px;
-  height: 52px;
-  white-space: nowrap;
+  transition: all 0.25s ease;
 }
 
 .hm-btn-solid {
-  background: linear-gradient(135deg, #0F2649, #163460);
-  color: #fff;
+  background: #D69A20 !important;
+  color: white !important;
+  border: none !important;
 }
 
 .hm-btn-solid:hover {
-  background: linear-gradient(135deg, #163460, #1B3D73);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(15, 38, 73, 0.25);
+  background: #E8B32D !important;
 }
 
 .hm-btn-outline {
-  background: transparent;
-  color: #fff;
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  background: transparent !important;
+  color: white !important;
+  border: 2px solid white !important;
 }
 
 .hm-btn-outline:hover {
-  border-color: #fff;
-  background: rgba(255, 255, 255, 0.12);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(255, 255, 255, 0.15);
-}
-
-@media (max-width: 620px) {
-  .hm-btn-solid,
-  .hm-btn-outline {
-    min-width: auto;
-    flex: 1;
-    min-width: 140px;
-  }
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* ---------- Booking card (floats in hero) ---------- */
