@@ -471,8 +471,18 @@ app.patch('/api/appointments/:id', requireAdmin, appointmentActionValidation, as
 });
 
 app.delete('/api/appointments/:id', requireAdmin, param('id').isInt().withMessage('Appointment ID must be a valid integer.'), handleValidationErrors, async (req, res) => {
-  // Appointment history is permanent; deletion is not allowed.
-  res.status(403).json({ error: 'Deleting appointment history is disabled.' });
+  try {
+    const { id } = req.params;
+    const success = await db.deleteAppointment(id);
+    if (success) {
+      res.json({ success: true, message: 'Appointment deleted successfully.' });
+    } else {
+      res.status(404).json({ error: 'Appointment not found.' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Could not delete appointment.' });
+  }
 });
 
 // ---------- Contact form (sends email directly to the MLA) ----------
