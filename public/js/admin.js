@@ -203,7 +203,7 @@ document.getElementById('logoutLink').addEventListener('click', async (e) => {
   }
   clearLoggedIn();
   sessionStorage.removeItem('mla_admin_token');
-  showLogin();
+  window.location.href = 'index.html';
 });
 
 document.getElementById('handoverBtn').addEventListener('click', (e) => {

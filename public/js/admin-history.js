@@ -88,7 +88,7 @@ document.getElementById('handoverBtn').addEventListener('click', () => {
 });
 
 document.getElementById('logoutLink').addEventListener('click', () => {
-  window.location.href = 'admin.html';
+  window.location.href = 'index.html';
 });
 
 init();
