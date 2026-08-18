@@ -1,5 +1,47 @@
 const HM_API_BASE = 'https://mla-appointment-system.onrender.com/api';
 
+async function fetchWithTimeout(url, options = {}, timeoutMs = 18000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    return res;
+  } catch (error) {
+    if (error && error.name === 'AbortError') {
+      const timeoutError = new Error('Request timed out. Please try again in a moment.');
+      timeoutError.name = 'TimeoutError';
+      throw timeoutError;
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function submitRequestWithFallback(url, payload, { successMessage, timeoutMsg, errorCtx }) {
+  try {
+    const res = await fetchWithTimeout(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }, 18000);
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(data.error || errorCtx || 'Something went wrong. Please try again.');
+    }
+
+    return data;
+  } catch (err) {
+    if (err && err.name === 'TimeoutError') {
+      throw new Error(timeoutMsg || 'The server is taking too long to respond. Please try again in a moment.');
+    }
+    throw new Error(err && err.message ? err.message : (errorCtx || 'Could not reach the server. Please try again shortly.'));
+  }
+}
+
 // Prevent picking a past date
 const hmDateInput = document.getElementById('hmDate');
 if (hmDateInput) hmDateInput.min = new Date().toISOString().split('T')[0];
@@ -104,23 +146,16 @@ if (contactForm) {
     if (contactSubmitBtn) contactSubmitBtn.textContent = 'Sending…';
 
     try {
-      const res = await fetch(`${HM_API_BASE}/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+      const data = await submitRequestWithFallback(`${HM_API_BASE}/contact`, payload, {
+        timeoutMsg: 'The contact server is taking too long to respond. Please try again in a moment.',
+        errorCtx: 'Could not send your message. Please try again.'
       });
-      const data = await res.json();
 
-      if (!res.ok) {
-        contactFormMsg.textContent = data.error || 'Could not send your message. Please try again.';
-        contactFormMsg.className = 'hm-form-msg show error';
-      } else {
-        contactFormMsg.textContent = 'Message sent! The office will get back to you soon.';
-        contactFormMsg.className = 'hm-form-msg show success';
-        contactForm.reset();
-      }
+      contactFormMsg.textContent = 'Message sent! The office will get back to you soon.';
+      contactFormMsg.className = 'hm-form-msg show success';
+      contactForm.reset();
     } catch (err) {
-      contactFormMsg.textContent = 'Could not reach the server. Please try again shortly.';
+      contactFormMsg.textContent = err.message || 'Could not reach the server. Please try again shortly.';
       contactFormMsg.className = 'hm-form-msg show error';
     } finally {
       if (contactSubmitBtn) {
@@ -158,25 +193,18 @@ if (heroForm) {
     hmSubmitBtn.textContent = 'Submitting…';
 
     try {
-      const res = await fetch(`${HM_API_BASE}/appointments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+      const data = await submitRequestWithFallback(`${HM_API_BASE}/appointments`, payload, {
+        timeoutMsg: 'The booking server is taking too long to respond. Please try again in a moment.',
+        errorCtx: 'Something went wrong. Please try again.'
       });
-      const data = await res.json();
 
-      if (!res.ok) {
-        hmFormMsg.textContent = data.error || 'Something went wrong. Please try again.';
-        hmFormMsg.className = 'hm-form-msg show error';
-      } else {
-        const modal = document.getElementById('heroSuccessModal');
-        const modalText = document.getElementById('heroSuccessModalText');
-        modalText.innerHTML = `Request submitted! Your token number is <strong>${data.tokenNumber}</strong>. You can check its status any time from the <a href="appointments.html" style="text-decoration:underline;color:#0F2649;">Appointments page</a>.`;
-        modal.classList.add('show');
-        heroForm.reset();
-      }
+      const modal = document.getElementById('heroSuccessModal');
+      const modalText = document.getElementById('heroSuccessModalText');
+      modalText.innerHTML = `Request submitted! Your token number is <strong>${data.tokenNumber}</strong>. You can check its status any time from the <a href="appointments.html" style="text-decoration:underline;color:#0F2649;">Appointments page</a>.`;
+      modal.classList.add('show');
+      heroForm.reset();
     } catch (err) {
-      hmFormMsg.textContent = 'Could not reach the server. Please try again shortly.';
+      hmFormMsg.textContent = err.message || 'Could not reach the server. Please try again shortly.';
       hmFormMsg.className = 'hm-form-msg show error';
     } finally {
       hmSubmitBtn.disabled = false;

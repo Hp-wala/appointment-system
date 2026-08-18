@@ -1,5 +1,24 @@
 const API_BASE = 'https://mla-appointment-system.onrender.com/api';
 
+async function fetchWithTimeout(url, options = {}, timeoutMs = 18000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    return res;
+  } catch (error) {
+    if (error && error.name === 'AbortError') {
+      const timeoutError = new Error('Request timed out. Please try again in a moment.');
+      timeoutError.name = 'TimeoutError';
+      throw timeoutError;
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 const bookingForm = document.getElementById('bookingForm');
 const formMsg = document.getElementById('formMsg');
 const submitBtn = document.getElementById('submitBtn');
@@ -45,15 +64,15 @@ bookingForm.addEventListener('submit', async (e) => {
   }
 
   submitBtn.disabled = true;
-  submitBtn.textContent = 'Submitting…';
+  submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span>Submitting…';
 
   try {
-    const res = await fetch(`${API_BASE}/appointments`, {
+    const res = await fetchWithTimeout(`${API_BASE}/appointments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
-    });
-    const data = await res.json();
+    }, 18000);
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
       showMsg(formMsg, data.error || 'Something went wrong. Please try again.', 'error');
@@ -69,10 +88,13 @@ bookingForm.addEventListener('submit', async (e) => {
       bookingForm.reset();
     }
   } catch (err) {
-    showMsg(formMsg, 'Could not reach the server. Please try again shortly.', 'error');
+    const msg = err && err.name === 'TimeoutError'
+      ? 'The server is taking too long to respond. Please try again in a moment.'
+      : 'Could not reach the server. Please try again shortly.';
+    showMsg(formMsg, msg, 'error');
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Submit Request';
+    submitBtn.innerHTML = 'Submit Request';
   }
 });
 
@@ -95,15 +117,15 @@ document.getElementById('checkStatusBtn').addEventListener('click', async () => 
   }
 
   resultsEl.className = 'hm-form-msg show';
-  resultsEl.innerHTML = '<p style="font-size:13px;color:var(--ink-soft);">Looking up your requests…</p>';
+  resultsEl.innerHTML = '<p style="font-size:13px;color:var(--ink-soft);"><span class="spinner" style="width:12px;height:12px;border-width:2px;vertical-align:middle;display:inline-block;margin-right:6px;"></span>Looking up your requests…</p>';
 
   try {
-    const res = await fetch(`${API_BASE}/appointments/status`, {
+    const res = await fetchWithTimeout(`${API_BASE}/appointments/status`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mobile, email })
-    });
-    const appointments = await res.json();
+    }, 18000);
+    const appointments = await res.json().catch(() => []);
 
     if (!appointments.length) {
       resultsEl.className = 'hm-form-msg show';
@@ -118,8 +140,11 @@ document.getElementById('checkStatusBtn').addEventListener('click', async () => 
     resultsEl.className = 'hm-form-msg show';
     resultsEl.innerHTML = appointments.map(renderCitizenCard).join('');
   } catch (err) {
+    const msg = err && err.name === 'TimeoutError'
+      ? 'The server is taking too long to respond. Please try again in a moment.'
+      : 'Could not reach the server. Please try again shortly.';
     resultsEl.className = 'hm-form-msg show error';
-    resultsEl.innerHTML = 'Could not reach the server. Please try again shortly.';
+    resultsEl.innerHTML = msg;
   }
 });
 
