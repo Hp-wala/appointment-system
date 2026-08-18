@@ -81,16 +81,21 @@ document.getElementById('checkStatusBtn').addEventListener('click', async () => 
   const email = document.getElementById('statusEmail').value.trim();
   const resultsEl = document.getElementById('statusResults');
 
+  resultsEl.className = 'hm-form-msg';
+
   if (!/^[0-9]{10}$/.test(mobile)) {
-    resultsEl.innerHTML = `<div class="form-msg show error">Enter a valid 10-digit mobile number.</div>`;
+    resultsEl.className = 'hm-form-msg show error';
+    resultsEl.innerHTML = 'Enter a valid 10-digit mobile number.';
     return;
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    resultsEl.innerHTML = `<div class="form-msg show error">Enter the same email address you used when submitting the request.</div>`;
+    resultsEl.className = 'hm-form-msg show error';
+    resultsEl.innerHTML = 'Enter the same email address you used when submitting the request.';
     return;
   }
 
-  resultsEl.innerHTML = `<p style="font-size:13px;color:var(--ink-soft);">Looking up your requests…</p>`;
+  resultsEl.className = 'hm-form-msg show';
+  resultsEl.innerHTML = '<p style="font-size:13px;color:var(--ink-soft);">Looking up your requests…</p>';
 
   try {
     const res = await fetch(`${API_BASE}/appointments/status`, {
@@ -101,6 +106,7 @@ document.getElementById('checkStatusBtn').addEventListener('click', async () => 
     const appointments = await res.json();
 
     if (!appointments.length) {
+      resultsEl.className = 'hm-form-msg show';
       resultsEl.innerHTML = `
         <div class="empty-state">
           <div class="glyph">🗂️</div>
@@ -109,9 +115,11 @@ document.getElementById('checkStatusBtn').addEventListener('click', async () => 
       return;
     }
 
+    resultsEl.className = 'hm-form-msg show';
     resultsEl.innerHTML = appointments.map(renderCitizenCard).join('');
   } catch (err) {
-    resultsEl.innerHTML = `<div class="form-msg show error">Could not reach the server. Please try again shortly.</div>`;
+    resultsEl.className = 'hm-form-msg show error';
+    resultsEl.innerHTML = 'Could not reach the server. Please try again shortly.';
   }
 });
 
