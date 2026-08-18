@@ -400,6 +400,17 @@ html, body { overflow-x: hidden; max-width: 100%; }
 .hm-field {
   min-width: 0;
 }
+.hm-field label {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--hm-navy);
+}
+.hm-field input,
+.hm-field textarea {
+  font-size: 14px;
+}
 .hm-submit-btn {
   width: 100%;
   background: linear-gradient(135deg, var(--hm-gold-2), var(--hm-gold-dark));
