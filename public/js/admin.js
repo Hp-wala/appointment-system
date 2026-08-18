@@ -572,6 +572,7 @@ function renderAdminCard(a) {
         <button class="btn btn-approve btn-sm" onclick="handleApprove(${a.id})">Approve</button>
         <button class="btn btn-reschedule btn-sm" onclick="openRescheduleModal(${a.id})">Reschedule</button>
         <button class="btn btn-reject btn-sm" onclick="handleReject(${a.id})">Reject</button>
+        <button class="btn btn-reject btn-sm" onclick="handleDelete(${a.id})" style="background:#c34141;color:#fff;">Delete</button>
       </div>`;
   }
 
