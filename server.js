@@ -34,8 +34,20 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   : [
       'http://localhost:3000',
       'http://127.0.0.1:3000',
-      'https://mla-appointment-system.onrender.com'
+      'https://mla-appointment-system.onrender.com',
+      'https://appointment-system1.netlify.app',
+      'https://www.appointment-system1.netlify.app'
     ];
+
+function isAllowedOrigin(origin) {
+  if (!origin) return false;
+  try {
+    const hostname = new URL(origin).hostname;
+    return allowedOrigins.includes(origin) || hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.netlify.app') || hostname === 'netlify.app';
+  } catch (e) {
+    return false;
+  }
+}
 
 if (!process.env.ALLOWED_ORIGINS) {
   console.warn('WARNING: ALLOWED_ORIGINS is not configured. Defaulting to localhost and the Render deployment URL.');
@@ -254,7 +266,7 @@ app.use(cors((req, callback) => {
   if (!origin) {
     corsOptions.origin = true;
   } else {
-    const isAllowed = allowedOrigins.includes(origin);
+    const isAllowed = isAllowedOrigin(origin);
     let isSameOrigin = false;
     try {
       const originHost = new URL(origin).host;
