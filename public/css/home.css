@@ -301,20 +301,65 @@ html, body { overflow-x: hidden; max-width: 100%; }
 .hm-hero p.hm-lede {
   color: rgba(255,255,255,0.78); font-size: 15.5px; max-width: 480px; margin-bottom: 26px;
 }
-.hm-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-.hm-btn-solid {
-  background: #fff; color: #0F2649; font-weight: 700; font-size: 13.5px;
-  padding: 13px 24px; border-radius: 5px; display: inline-flex; align-items: center; gap: 8px;
+.hm-hero-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: stretch;
 }
-.hm-strip .hm-btn-solid {
-  color: #0F2649;
-}
+
+.hm-btn-solid,
 .hm-btn-outline {
-  border: 1.5px solid rgba(255,255,255,0.5); color: #fff; font-weight: 700; font-size: 13.5px;
-  padding: 13px 24px; border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 14px 28px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  min-width: 200px;
+  height: 52px;
+  white-space: nowrap;
 }
-.hm-btn-solid:hover { background: var(--hm-cream); }
-.hm-btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.08); }
+
+.hm-btn-solid {
+  background: linear-gradient(135deg, #0F2649, #163460);
+  color: #fff;
+}
+
+.hm-btn-solid:hover {
+  background: linear-gradient(135deg, #163460, #1B3D73);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(15, 38, 73, 0.25);
+}
+
+.hm-btn-outline {
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.hm-btn-outline:hover {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(255, 255, 255, 0.15);
+}
+
+@media (max-width: 620px) {
+  .hm-btn-solid,
+  .hm-btn-outline {
+    min-width: auto;
+    flex: 1;
+    min-width: 140px;
+  }
+}
 
 /* ---------- Booking card (floats in hero) ---------- */
 .hm-booking-card {
