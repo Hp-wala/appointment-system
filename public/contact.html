@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Contact — Office of the MLA</title>
 <link rel="icon" type="image/png" href="images/mla-favicon.png">
+<link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/home.css">
 </head>
 <body class="hm">
@@ -61,10 +62,23 @@
 </section>
 
 <!-- Contact form + details -->
-<section class="hm-section">
-  <div class="hm-wrap">
-    <div class="hm-info-grid hm-contact-grid">
-      <div class="panel-body" style="background:var(--hm-cream);border-radius:var(--hm-radius);padding:26px;">
+<main class="page container">
+  <div class="intro" style="text-align:center;margin-bottom:36px;">
+    <h2>Send us a Message</h2>
+    <p>Fill in your details and message below. We'll get back to you as soon as possible.</p>
+  </div>
+
+  <div class="grid-2">
+    <!-- Contact form -->
+    <section class="appointment-card">
+      <div class="hm-booking-head">
+        <span class="icn">✉️</span>
+        <div>
+          <strong>Send us a Message</strong>
+          <span>Your message goes straight to our office inbox</span>
+        </div>
+      </div>
+      <div class="hm-booking-body">
         <form id="contactForm">
           <div class="hm-field">
             <label for="cName">Full Name</label>
@@ -75,14 +89,14 @@
             <input type="email" id="cEmail" placeholder="you@example.com" required>
           </div>
           <div class="hm-field">
-            <label for="cPhone">Phone Number <span style="font-weight:400;color:var(--hm-muted);">(optional)</span></label>
+            <label for="cPhone">Phone Number <span class="sub">(optional)</span></label>
             <input type="tel" id="cPhone" placeholder="98xxxxxxxx">
           </div>
           <div class="hm-field">
             <label for="cMessage">Message</label>
-            <textarea id="cMessage" rows="5" placeholder="Write your message here..." required style="width:100%;font-family:'Inter',sans-serif;font-size:13.5px;padding:10px 12px;border:1px solid var(--hm-line);border-radius:5px;resize:vertical;"></textarea>
+            <textarea id="cMessage" name="cMessage" placeholder="Write your message here..." required></textarea>
           </div>
-          <div style="display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;">
+          <div style="display:grid;grid-template-columns:1fr;gap:12px;margin-top:16px;">
             <button type="button" class="hm-submit-btn hm-whatsapp-btn" data-server="1">Send Message - Server 1</button>
             <button type="button" class="hm-submit-btn hm-whatsapp-btn" data-server="2">Send Message - Server 2</button>
             <button type="button" class="hm-submit-btn hm-whatsapp-btn" data-server="3">Send Message - Server 3</button>
@@ -90,56 +104,57 @@
           <div class="hm-form-msg" id="contactFormMsg"></div>
         </form>
       </div>
+    </section>
 
-      <aside class="contact-card">
-        <div class="contact-card-header">
-          <span class="icn">📍</span>
-          <div>
-            <strong>Office Contact Details</strong>
-            <span>Reach the MLA's office directly</span>
+    <!-- Office Contact Details -->
+    <section class="appointment-card">
+      <div class="hm-booking-head">
+        <span class="icn">📍</span>
+        <div>
+          <strong>Office Contact Details</strong>
+          <span>Reach us directly</span>
+        </div>
+      </div>
+      <div class="hm-booking-body">
+        <div class="contact-detail-list">
+          <div class="contact-detail-item">
+            <span class="emoji">📞</span>
+            <div>
+              <strong class="contact-detail-label">Phone</strong>
+              <span class="contact-detail-value">+91 96783 67047<br>+91 70990 12666<br>+91 94350 19219</span>
+            </div>
+          </div>
+          <div class="contact-detail-item">
+            <span class="emoji">✉️</span>
+            <div>
+              <strong class="contact-detail-label">Email</strong>
+              <span class="contact-detail-value">digantakalitamla@gamil.com</span>
+            </div>
+          </div>
+          <div class="contact-detail-item">
+            <span class="emoji">📍</span>
+            <div>
+              <strong class="contact-detail-label">Office Address</strong>
+              <span class="contact-detail-value">Dispur Road, Guwahati, Assam, India (Pin: 781006)</span>
+            </div>
+          </div>
+          <div class="contact-detail-item">
+            <span class="emoji">🕐</span>
+            <div>
+              <strong class="contact-detail-label">Office Hours</strong>
+              <span class="contact-detail-value">Mon – Sat, 10:00 AM – 5:00 PM</span>
+            </div>
           </div>
         </div>
-        <div class="contact-card-body">
-          <div class="contact-detail-list">
-            <div class="contact-detail-item">
-              <span class="emoji">📞</span>
-              <div>
-                <strong class="contact-detail-label">Phone</strong>
-                <span class="contact-detail-value">+91 96783 67047<br>+91 70990 12666<br>+91 94350 19219</span>
-              </div>
-            </div>
-            <div class="contact-detail-item">
-              <span class="emoji">✉️</span>
-              <div>
-                <strong class="contact-detail-label">Email</strong>
-                <span class="contact-detail-value">digantakalitamla@gamil.com</span>
-              </div>
-            </div>
-            <div class="contact-detail-item">
-              <span class="emoji">📍</span>
-              <div>
-                <strong class="contact-detail-label">Office Address</strong>
-                <span class="contact-detail-value">Dispur Road, Guwahati, Assam, India (Pin: 781006)</span>
-              </div>
-            </div>
-            <div class="contact-detail-item">
-              <span class="emoji">🕐</span>
-              <div>
-                <strong class="contact-detail-label">Office Hours</strong>
-                <span class="contact-detail-value">Mon – Sat, 10:00 AM – 5:00 PM</span>
-              </div>
-            </div>
-          </div>
 
-          <div class="contact-card-footer">
-            <p style="font-size:14px;color:var(--hm-muted); margin:0 0 12px;">Prefer to meet in person instead?</p>
-            <a href="appointments.html" class="hm-read-more" style="margin-top:8px;color:#fff; display:inline-block; padding:14px 22px; font-size:15px; border-radius:10px;">Book an Appointment</a>
-          </div>
+        <div style="border-top:1px solid rgba(23,56,100,0.12);padding-top:18px;margin-top:22px;">
+          <p style="font-size:14px;color:var(--ink-soft); margin:0 0 12px;">Prefer to meet in person instead?</p>
+          <a href="appointments.html" class="hm-submit-btn" style="display:block;text-align:center;text-decoration:none;background:var(--navy);color:#fff;">Book an Appointment</a>
         </div>
-      </aside>
-    </div>
+      </div>
+    </section>
   </div>
-</section>
+</main>
 
 <!-- Footer -->
 <footer class="hm-footer">
