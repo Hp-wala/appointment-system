@@ -1,149 +1,318 @@
 // db/database.js
-// Supabase-backed data access layer. Same function names/shapes as the
-// original JSON-file version (db/database.jsonfile.js) — server.js doesn't
-// need to change no matter which one you use.
-//
-// Requires supabase/schema.sql to have been run in your Supabase project's
-// SQL Editor first (creates the `appointments` table, the token-number
-// trigger, and the RLS policies).
+// Supabase-backed data access layer with a safe local JSON fallback.
+// This keeps the app running even when the connected Supabase project is
+// missing the expected schema or when the service key points to a different DB.
 
-const supabase = require('./supabaseClient');
+const fs = require('fs');
+const path = require('path');
 const crypto = require('crypto');
 
-// Convert DB row (snake_case) -> app shape (camelCase), matching what the
-// frontend already expects.
+let supabase = null;
+try {
+  supabase = require('./supabaseClient');
+} catch (err) {
+  console.warn('[DB] Supabase client unavailable; using local fallback storage.', err.message);
+}
+
+const FALLBACK_DB_PATH = path.join(__dirname, 'appointments.json');
+
+function ensureFallbackFile() {
+  if (!fs.existsSync(FALLBACK_DB_PATH)) {
+    fs.writeFileSync(FALLBACK_DB_PATH, JSON.stringify({ appointments: [], nextId: 1 }, null, 2));
+  }
+}
+
+function readFallbackData() {
+  ensureFallbackFile();
+  const raw = fs.readFileSync(FALLBACK_DB_PATH, 'utf-8');
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    return { appointments: [], nextId: 1 };
+  }
+}
+
+function writeFallbackData(data) {
+  fs.writeFileSync(FALLBACK_DB_PATH, JSON.stringify(data, null, 2));
+}
+
 function toAppShape(row) {
   if (!row) return null;
   return {
     id: row.id,
-    tokenNumber: row.token_number,
+    tokenNumber: row.token_number || row.tokenNumber,
     name: row.name,
     mobile: row.mobile,
     email: row.email,
     purpose: row.purpose,
-    preferredDate: row.preferred_date,
-    preferredTime: row.preferred_time,
+    preferredDate: row.preferred_date || row.preferredDate,
+    preferredTime: row.preferred_time || row.preferredTime,
     status: row.status,
-    confirmedDate: row.confirmed_date,
-    confirmedTime: row.confirmed_time,
-    adminNote: row.admin_note,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at
+    confirmedDate: row.confirmed_date || row.confirmedDate,
+    confirmedTime: row.confirmed_time || row.confirmedTime,
+    adminNote: row.admin_note || row.adminNote,
+    createdAt: row.created_at || row.createdAt,
+    updatedAt: row.updated_at || row.updatedAt
   };
 }
 
-// Generate a unique token number in app code.
-// The DB trigger (generate_appointment_token) will override this with a
-// sequential MLA-000001 format IF the trigger is set up correctly.
-// This fallback ensures inserts never fail due to NOT NULL on token_number.
+function fromAppShape(item) {
+  if (!item) return null;
+  return {
+    id: item.id,
+    token_number: item.tokenNumber,
+    name: item.name,
+    mobile: item.mobile,
+    email: item.email,
+    purpose: item.purpose,
+    preferred_date: item.preferredDate,
+    preferred_time: item.preferredTime,
+    status: item.status,
+    confirmed_date: item.confirmedDate,
+    confirmed_time: item.confirmedTime,
+    admin_note: item.adminNote,
+    created_at: item.createdAt,
+    updated_at: item.updatedAt
+  };
+}
+
 function generateFallbackToken() {
   const rand = crypto.randomInt(100000, 999999);
   return 'MLA-' + rand;
 }
 
-async function createAppointment({ name, mobile, email = null, purpose, preferredDate = null, preferredTime = null }) {
-  const { data, error } = await supabase
-    .from('appointments')
-    .insert({
-      name,
-      mobile,
-      email,
-      purpose,
-      preferred_date: preferredDate,
-      preferred_time: preferredTime,
-      status: 'pending',
-      token_number: generateFallbackToken() // DB trigger will override with sequential ID if set up
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error('[DB] createAppointment error:', JSON.stringify(error));
-    throw error;
-  }
-  return toAppShape(data);
+function generateTokenNumber(id) {
+  return 'MLA-' + String(id).padStart(6, '0');
 }
 
+function createFallbackAppointment({ name, mobile, email = null, purpose, preferredDate = null, preferredTime = null }) {
+  const data = readFallbackData();
+  const id = data.nextId;
+  const appointment = {
+    id,
+    tokenNumber: generateTokenNumber(id),
+    name,
+    mobile,
+    email,
+    purpose,
+    preferredDate,
+    preferredTime,
+    status: 'pending',
+    confirmedDate: null,
+    confirmedTime: null,
+    adminNote: '',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  data.appointments.push(appointment);
+  data.nextId += 1;
+  writeFallbackData(data);
+  return appointment;
+}
+
+function getFallbackAppointmentsByMobile(mobile) {
+  const data = readFallbackData();
+  return [...data.appointments]
+    .filter((item) => item.mobile === mobile)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+}
+
+function getFallbackAllAppointments() {
+  const data = readFallbackData();
+  return [...data.appointments].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+}
+
+function getFallbackAppointmentById(id) {
+  const data = readFallbackData();
+  return data.appointments.find((item) => item.id === Number(id)) || null;
+}
+
+function updateFallbackAppointment(id, updates) {
+  const data = readFallbackData();
+  const idx = data.appointments.findIndex((item) => item.id === Number(id));
+  if (idx === -1) return null;
+  data.appointments[idx] = {
+    ...data.appointments[idx],
+    ...updates,
+    updatedAt: new Date().toISOString()
+  };
+  writeFallbackData(data);
+  return data.appointments[idx];
+}
+
+function deleteFallbackAppointment(id) {
+  const data = readFallbackData();
+  const idx = data.appointments.findIndex((item) => item.id === Number(id));
+  if (idx === -1) return false;
+  data.appointments.splice(idx, 1);
+  writeFallbackData(data);
+  return true;
+}
+
+async function createAppointment({ name, mobile, email = null, purpose, preferredDate = null, preferredTime = null }) {
+  if (!supabase) {
+    return createFallbackAppointment({ name, mobile, email, purpose, preferredDate, preferredTime });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('appointments')
+      .insert({
+        name,
+        mobile,
+        email,
+        purpose,
+        preferred_date: preferredDate,
+        preferred_time: preferredTime,
+        status: 'pending',
+        token_number: generateFallbackToken()
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return toAppShape(data);
+  } catch (error) {
+    console.warn('[DB] Supabase createAppointment failed; falling back to local JSON storage.', error.message || error);
+    return createFallbackAppointment({ name, mobile, email, purpose, preferredDate, preferredTime });
+  }
+}
 
 async function getAllAppointments() {
-  const { data, error } = await supabase
-    .from('appointments')
-    .select('*')
-    .order('created_at', { ascending: false });
+  if (!supabase) return getFallbackAllAppointments();
 
-  if (error) throw error;
-  return data.map(toAppShape);
+  try {
+    const { data, error } = await supabase
+      .from('appointments')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data || []).map(toAppShape);
+  } catch (error) {
+    console.warn('[DB] Supabase getAllAppointments failed; using local JSON storage.', error.message || error);
+    return getFallbackAllAppointments();
+  }
 }
 
 async function getAppointmentsByMobile(mobile) {
-  const { data, error } = await supabase
-    .from('appointments')
-    .select('*')
-    .eq('mobile', mobile)
-    .order('created_at', { ascending: false });
+  if (!supabase) return getFallbackAppointmentsByMobile(mobile);
 
-  if (error) throw error;
-  return data.map(toAppShape);
+  try {
+    const { data, error } = await supabase
+      .from('appointments')
+      .select('*')
+      .eq('mobile', mobile)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data || []).map(toAppShape);
+  } catch (error) {
+    console.warn('[DB] Supabase getAppointmentsByMobile failed; using local JSON storage.', error.message || error);
+    return getFallbackAppointmentsByMobile(mobile);
+  }
 }
 
 async function getAppointmentById(id) {
-  const { data, error } = await supabase
-    .from('appointments')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
+  if (!supabase) return toAppShape(getFallbackAppointmentById(id));
 
-  if (error) throw error;
-  return toAppShape(data);
+  try {
+    const { data, error } = await supabase
+      .from('appointments')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) throw error;
+    return toAppShape(data);
+  } catch (error) {
+    console.warn('[DB] Supabase getAppointmentById failed; using local JSON storage.', error.message || error);
+    return toAppShape(getFallbackAppointmentById(id));
+  }
 }
 
 async function updateAppointment(id, updates) {
+  if (!supabase) return updateFallbackAppointment(id, updates);
+
   const dbUpdates = {};
   if (updates.status !== undefined) dbUpdates.status = updates.status;
   if (updates.confirmedDate !== undefined) dbUpdates.confirmed_date = updates.confirmedDate;
   if (updates.confirmedTime !== undefined) dbUpdates.confirmed_time = updates.confirmedTime;
   if (updates.adminNote !== undefined) dbUpdates.admin_note = updates.adminNote;
 
-  const { data, error } = await supabase
-    .from('appointments')
-    .update(dbUpdates)
-    .eq('id', id)
-    .select()
-    .maybeSingle();
+  try {
+    const { data, error } = await supabase
+      .from('appointments')
+      .update(dbUpdates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
 
-  if (error) throw error;
-  return toAppShape(data);
+    if (error) throw error;
+    return toAppShape(data);
+  } catch (error) {
+    console.warn('[DB] Supabase updateAppointment failed; using local JSON storage.', error.message || error);
+    const existing = getFallbackAppointmentById(id);
+    if (!existing) return null;
+    const updated = {
+      ...existing,
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+    return updateFallbackAppointment(id, updated);
+  }
 }
 
 async function deleteAppointment(id) {
-  const { error } = await supabase.from('appointments').delete().eq('id', id);
-  if (error) throw error;
-  return true;
+  if (!supabase) return deleteFallbackAppointment(id);
+
+  try {
+    const { error } = await supabase.from('appointments').delete().eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.warn('[DB] Supabase deleteAppointment failed; using local JSON storage.', error.message || error);
+    return deleteFallbackAppointment(id);
+  }
 }
 
 async function logSecurityEvent(entry) {
-  const { data, error } = await supabase.from('security_logs').insert({
-    event_type: entry.eventType,
-    ip_address: entry.ipAddress,
-    latitude: entry.latitude,
-    longitude: entry.longitude,
-    city: entry.city,
-    region: entry.region,
-    country: entry.country,
-    user_agent: entry.userAgent,
-    request_path: entry.requestPath,
-    details: entry.details
-  });
-  if (error) throw error;
-  return data;
+  if (!supabase) return null;
+
+  try {
+    const { data, error } = await supabase.from('security_logs').insert({
+      event_type: entry.eventType,
+      ip_address: entry.ipAddress,
+      latitude: entry.latitude,
+      longitude: entry.longitude,
+      city: entry.city,
+      region: entry.region,
+      country: entry.country,
+      user_agent: entry.userAgent,
+      request_path: entry.requestPath,
+      details: entry.details
+    });
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.warn('[DB] Supabase logSecurityEvent failed; skipped.', error.message || error);
+    return null;
+  }
 }
 
 async function getSecurityLogs({ limit = 100, eventType = null } = {}) {
-  let query = supabase.from('security_logs').select('*').order('created_at', { ascending: false }).limit(limit);
-  if (eventType) query = query.eq('event_type', eventType);
-  const { data, error } = await query;
-  if (error) throw error;
-  return data;
+  if (!supabase) return [];
+
+  try {
+    let query = supabase.from('security_logs').select('*').order('created_at', { ascending: false }).limit(limit);
+    if (eventType) query = query.eq('event_type', eventType);
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.warn('[DB] Supabase getSecurityLogs failed; returning empty list.', error.message || error);
+    return [];
+  }
 }
 
 module.exports = {
