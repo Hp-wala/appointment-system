@@ -310,11 +310,11 @@ html, body { overflow-x: hidden; max-width: 100%; }
   color: #0F2649;
 }
 .hm-btn-outline {
-  border: 2px solid #fff; color: #fff; font-weight: 700; font-size: 14px;
-  padding: 14px 26px; border-radius: 6px; transition: all 0.15s ease;
+  border: 1.5px solid rgba(255,255,255,0.5); color: #fff; font-weight: 700; font-size: 13.5px;
+  padding: 13px 24px; border-radius: 5px;
 }
 .hm-btn-solid:hover { background: var(--hm-cream); }
-.hm-btn-outline:hover { border-color: var(--hm-gold-2); color: var(--hm-gold-2); background: rgba(255,255,255,0.08); }
+.hm-btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.08); }
 
 /* ---------- Booking card (floats in hero) ---------- */
 .hm-booking-card {
