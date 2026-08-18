@@ -464,9 +464,30 @@ textarea { resize: vertical; min-height: 80px; }
   border-bottom: 2px solid transparent;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 .tab-btn.active { color: var(--navy); border-bottom-color: var(--gold); }
+.tab-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--gold), #c57e16);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 10px rgba(200, 146, 32, 0.25);
+}
+.tab-icon-alt {
+  background: linear-gradient(135deg, #7b879a, #40506a);
+}
+.tab-icon-soft {
+  background: linear-gradient(135deg, #d6a94c, #b57b0d);
+  font-size: 9px;
+}
 .tab-count {
   background: var(--line);
   color: var(--ink);
